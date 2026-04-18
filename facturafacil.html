@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>FacturaFácil</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --verde: #1D9E75;
+  --verde-claro: #E1F5EE;
+  --verde-oscuro: #0F6E56;
+  --texto: #1a1a1a;
+  --texto-2: #6b7280;
+  --borde: #e5e7eb;
+  --fondo: #f9fafb;
+  --blanco: #ffffff;
+  --rojo: #ef4444;
+  --rojo-claro: #fef2f2;
+  --amarillo: #f59e0b;
+  --amarillo-claro: #fffbeb;
+  --radio: 12px;
+  --radio-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'DM Sans', sans-serif; background: var(--fondo); color: var(--texto); font-size: 15px; }
+.app { max-width: 480px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: var(--blanco); }
+
+/* HEADER */
+.header { background: var(--verde); color: white; padding: 16px 20px 14px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.header-left { display: flex; align-items: center; gap: 10px; }
+.header-logo { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
+.header-sub { font-size: 11px; opacity: .75; }
+.header-btn { background: rgba(255,255,255,.2); border: none; color: white; border-radius: 8px; padding: 6px 10px; font-size: 12px; cursor: pointer; font-family: inherit; }
+
+/* NAV */
+.nav { display: flex; background: var(--blanco); border-bottom: 1px solid var(--borde); position: sticky; top: 54px; z-index: 99; }
+.nav-btn { flex: 1; padding: 10px 2px 8px; font-size: 11px; color: var(--texto-2); border: none; background: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; font-family: inherit; border-bottom: 2px solid transparent; transition: all .15s; }
+.nav-btn svg { width: 20px; height: 20px; }
+.nav-btn.active { color: var(--verde); border-bottom-color: var(--verde); font-weight: 500; }
+
+/* SECTIONS */
+.section { display: none; flex: 1; padding: 16px; }
+.section.active { display: block; }
+
+/* CARDS */
+.card { background: var(--blanco); border: 1px solid var(--borde); border-radius: var(--radio); padding: 16px; margin-bottom: 14px; }
+.card-title { font-size: 11px; font-weight: 600; color: var(--texto-2); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 12px; }
+
+/* FORM */
+.field { margin-bottom: 12px; }
+.field label { font-size: 12px; color: var(--texto-2); display: block; margin-bottom: 5px; font-weight: 500; }
+.field input, .field select, .field textarea {
+  width: 100%; padding: 10px 12px; font-size: 14px; border: 1px solid var(--borde);
+  border-radius: var(--radio-sm); background: var(--fondo); color: var(--texto);
+  font-family: inherit; outline: none; transition: border .15s;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--verde); background: white; }
+.field textarea { resize: none; height: 70px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* BUTTONS */
+.btn { width: 100%; padding: 12px; border-radius: var(--radio-sm); font-size: 14px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: opacity .15s, transform .1s; }
+.btn:active { transform: scale(.98); opacity: .9; }
+.btn-primary { background: var(--verde); color: white; }
+.btn-secondary { background: var(--fondo); color: var(--texto); border: 1px solid var(--borde); }
+.btn-danger { background: var(--rojo-claro); color: var(--rojo); border: 1px solid #fca5a5; }
+.btn-sm { padding: 7px 14px; font-size: 13px; width: auto; border-radius: 20px; }
+
+/* STATS */
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.stat { background: var(--fondo); border-radius: var(--radio-sm); padding: 14px; border: 1px solid var(--borde); }
+.stat-val { font-size: 22px; font-weight: 600; color: var(--texto); }
+.stat-lbl { font-size: 11px; color: var(--texto-2); margin-top: 2px; }
+.stat-verde .stat-val { color: var(--verde-oscuro); }
+
+/* LIST */
+.list-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--borde); cursor: pointer; }
+.list-item:last-child { border-bottom: none; }
+.list-item:active { opacity: .7; }
+.avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--verde-claro); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: var(--verde-oscuro); flex-shrink: 0; }
+.list-info { flex: 1; min-width: 0; }
+.list-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.list-sub { font-size: 12px; color: var(--texto-2); margin-top: 1px; }
+
+/* BADGES */
+.badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
+.badge-green { background: var(--verde-claro); color: var(--verde-oscuro); }
+.badge-yellow { background: var(--amarillo-claro); color: #92400e; }
+.badge-red { background: var(--rojo-claro); color: #991b1b; }
+.badge-gray { background: var(--fondo); color: var(--texto-2); border: 1px solid var(--borde); }
+
+/* TABS */
+.tabs { display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { padding: 7px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; border: 1px solid var(--borde); background: var(--blanco); color: var(--texto-2); white-space: nowrap; font-family: inherit; transition: all .15s; }
+.tab.active { background: var(--verde); color: white; border-color: var(--verde); font-weight: 500; }
+
+/* PRODUCTO ROW */
+.prod-row { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--borde); }
+.prod-row:last-child { border-bottom: none; }
+.prod-name { flex: 1; font-size: 13px; font-weight: 500; min-width: 0; }
+.prod-detail { font-size: 11px; color: var(--texto-2); }
+.prod-price { font-size: 13px; font-weight: 600; color: var(--verde-oscuro); min-width: 72px; text-align: right; font-family: 'DM Mono', monospace; }
+
+/* QTY */
+.qty { display: flex; align-items: center; gap: 6px; }
+.qty-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--borde); background: var(--fondo); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--texto); line-height: 1; }
+.qty-val { font-size: 14px; font-weight: 600; min-width: 20px; text-align: center; }
+
+/* TOTAL BAR */
+.total-bar { background: var(--verde-claro); border-radius: var(--radio-sm); padding: 14px 16px; margin: 12px 0; }
+.total-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--texto-2); margin-bottom: 4px; }
+.total-row.main { font-size: 16px; font-weight: 700; color: var(--verde-oscuro); margin-bottom: 0; margin-top: 8px; padding-top: 8px; border-top: 1px solid #9FE1CB; }
+.total-num { font-family: 'DM Mono', monospace; font-weight: 500; color: var(--texto); }
+.total-row.main .total-num { color: var(--verde-oscuro); font-size: 18px; }
+
+/* UPLOAD */
+.upload-box { border: 2px dashed var(--borde); border-radius: var(--radio-sm); padding: 24px 16px; text-align: center; cursor: pointer; color: var(--texto-2); font-size: 13px; transition: border-color .15s; }
+.upload-box:hover { border-color: var(--verde); }
+.upload-box svg { width: 32px; height: 32px; margin-bottom: 8px; opacity: .4; }
+
+/* MAP BOX */
+.map-box { background: var(--fondo); border: 1px solid var(--borde); border-radius: var(--radio-sm); height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: border-color .15s; }
+.map-box:hover { border-color: var(--verde); }
+.map-box svg { width: 28px; height: 28px; fill: var(--verde); }
+
+/* TOGGLE */
+.toggle-wrap { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--borde); }
+.toggle-wrap:last-child { border-bottom: none; }
+.toggle-info { flex: 1; }
+.toggle-label { font-size: 14px; font-weight: 500; }
+.toggle-sub { font-size: 12px; color: var(--texto-2); margin-top: 2px; }
+.toggle { width: 44px; height: 24px; border-radius: 12px; background: var(--borde); position: relative; cursor: pointer; transition: background .2s; flex-shrink: 0; border: none; }
+.toggle.on { background: var(--verde); }
+.toggle::after { content: ''; width: 20px; height: 20px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+.toggle.on::after { left: 22px; }
+
+/* FACTURA PRINT */
+.factura-preview { background: white; border: 1px solid var(--borde); border-radius: var(--radio); padding: 20px; }
+.factura-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+.factura-empresa { font-size: 16px; font-weight: 700; color: var(--verde); }
+.factura-num { font-size: 13px; color: var(--texto-2); text-align: right; }
+.factura-divider { height: 1px; background: var(--borde); margin: 12px 0; }
+.factura-cliente { font-size: 13px; margin-bottom: 12px; }
+.factura-cliente strong { display: block; font-size: 14px; }
+.factura-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 12px; }
+.factura-table th { padding: 6px 0; font-weight: 600; color: var(--texto-2); font-size: 11px; text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid var(--borde); }
+.factura-table td { padding: 7px 0; border-bottom: 1px solid #f3f4f6; }
+.factura-table td:last-child, .factura-table th:last-child { text-align: right; font-family: 'DM Mono', monospace; }
+
+/* MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 200; align-items: flex-end; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: white; border-radius: 20px 20px 0 0; padding: 20px; width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto; }
+.modal-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+.modal-close { float: right; background: var(--fondo); border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+/* EMPTY */
+.empty { text-align: center; padding: 40px 20px; color: var(--texto-2); }
+.empty svg { width: 48px; height: 48px; opacity: .2; margin-bottom: 12px; }
+.empty p { font-size: 14px; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); background: #1a1a1a; color: white; padding: 10px 20px; border-radius: 20px; font-size: 13px; z-index: 999; opacity: 0; transition: all .3s; pointer-events: none; white-space: nowrap; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* SEARCH */
+.search-wrap { position: relative; margin-bottom: 12px; }
+.search-wrap input { padding-left: 36px; }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--texto-2); pointer-events: none; }
+.search-icon svg { width: 16px; height: 16px; }
+
+/* CHIPS */
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.chip { font-size: 12px; padding: 4px 10px; border-radius: 20px; background: var(--verde-claro); color: var(--verde-oscuro); display: flex; align-items: center; gap: 4px; cursor: pointer; }
+.chip-x { font-size: 14px; line-height: 1; opacity: .7; }
+
+/* ===== TICKET 58MM ===== */
+.ticket-wrap { background: #f5f5f0; border-radius: var(--radio-sm); padding: 12px; display: flex; justify-content: center; margin-bottom: 12px; }
+.ticket-58 { width: 216px; background: white; font-family: 'Courier New', monospace; font-size: 11px; color: #000; padding: 10px 8px; border: 1px dashed #ccc; line-height: 1.5; }
+.ticket-58 .t-center { text-align: center; }
+.ticket-58 .t-right { text-align: right; }
+.ticket-58 .t-bold { font-weight: bold; }
+.ticket-58 .t-big { font-size: 14px; font-weight: bold; }
+.ticket-58 .t-line { border-top: 1px dashed #000; margin: 5px 0; }
+.ticket-58 .t-row { display: flex; justify-content: space-between; }
+.ticket-58 .t-row .t-name { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 130px; }
+.ticket-58 .t-row .t-amt { text-align: right; min-width: 70px; }
+.ticket-58 .t-logo { font-size: 16px; font-weight: bold; letter-spacing: 1px; }
+.ticket-58 .t-small { font-size: 9px; color: #555; }
+
+/* BT STATUS */
+.bt-status { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: var(--radio-sm); font-size: 13px; margin-bottom: 12px; }
+.bt-status.desconectado { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
+.bt-status.conectado { background: var(--verde-claro); color: var(--verde-oscuro); border: 1px solid #9FE1CB; }
+.bt-status.buscando { background: var(--amarillo-claro); color: #92400e; border: 1px solid #fcd34d; }
+.bt-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.bt-status.desconectado .bt-dot { background: #ef4444; }
+.bt-status.conectado .bt-dot { background: var(--verde); animation: pulse 2s infinite; }
+.bt-status.buscando .bt-dot { background: #f59e0b; animation: pulse .8s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+@media print {
+  .no-print { display: none !important; }
+  .app { max-width: 100%; }
+  .factura-preview { border: none; padding: 0; }
+}
+@media print {
+  @page { size: 58mm auto; margin: 2mm; }
+  body.imprimiendo-ticket * { display: none !important; }
+  body.imprimiendo-ticket #ticket-print-frame { display: block !important; position: fixed; top: 0; left: 0; width: 58mm; }
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div class="app">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div>
+        <div class="header-logo">FacturaFácil</div>
+        <div class="header-sub" id="empresa-nombre-header">Mi Negocio</div>
+      </div>
+    </div>
+    <button class="header-btn" onclick="showModal('modal-ayuda')">? Ayuda</button>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav" id="nav">
+    <button class="nav-btn active" onclick="go('inicio',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      Inicio
+    </button>
+    <button class="nav-btn" onclick="go('clientes',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      Clientes
+    </button>
+    <button class="nav-btn" onclick="go('inventario',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.36C18 2.51 16.49 1 14.64 1c-1.15 0-2.12.59-2.79 1.48l-.85 1.14-.85-1.14C9.48 1.59 8.51 1 7.36 1 5.51 1 4 2.51 4 4.36c0 .48.11.92.18 1.36H2v13c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
+      Inventario
+    </button>
+    <button class="nav-btn" onclick="go('facturar',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+      Facturar
+    </button>
+    <button class="nav-btn" onclick="go('config',this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.1 7.1 0 0 0-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87a.48.48 0 0 0 .12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.48.48 0 0 0-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+      Config
+    </button>
+  </div>
+
+  <!-- ===== INICIO ===== -->
+  <div id="sec-inicio" class="section active">
+    <div class="stats" id="stats-box"></div>
+    <div class="card">
+      <div class="card-title">Facturas recientes</div>
+      <div id="lista-recientes"></div>
+    </div>
+    <button class="btn btn-primary" onclick="go('facturar', document.querySelectorAll('.nav-btn')[3]); nuevaFactura()">+ Nueva factura</button>
+  </div>
+
+  <!-- ===== CLIENTES ===== -->
+  <div id="sec-clientes" class="section">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(this,'tc-lista')">Clientes</button>
+      <button class="tab" onclick="switchTab(this,'tc-nuevo')">+ Nuevo</button>
+    </div>
+    <div id="tc-lista">
+      <div class="search-wrap">
+        <span class="search-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></span>
+        <input type="search" placeholder="Buscar cliente..." oninput="filtrarClientes(this.value)" style="padding-left:36px">
+      </div>
+      <div class="card" id="clientes-lista"></div>
+    </div>
+    <div id="tc-nuevo" style="display:none">
+      <div class="card">
+        <div class="card-title">Registrar cliente</div>
+        <div class="field"><label>Nombre del establecimiento *</label><input id="c-establecimiento" placeholder="Ej: Tienda La Esperanza"></div>
+        <div class="field-row">
+          <div class="field"><label>Nombre *</label><input id="c-nombre" placeholder="Nombre"></div>
+          <div class="field"><label>Apellidos *</label><input id="c-apellidos" placeholder="Apellidos"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Identificación</label><input id="c-id" placeholder="NIT / CC"></div>
+          <div class="field"><label>Teléfono</label><input id="c-phone" type="tel" placeholder="310 000 0000"></div>
+        </div>
+        <div class="field"><label>Email</label><input id="c-email" type="email" placeholder="correo@ejemplo.com"></div>
+        <div class="field"><label>Dirección</label><input id="c-dir" placeholder="Calle, ciudad"></div>
+        <div class="field"><label>Ubicación (georreferencia)</label>
+          <div class="map-box" onclick="geolocate()">
+            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            <span id="geo-label" style="font-size:12px;color:var(--texto-2)">Tocar para detectar ubicación GPS</span>
+          </div>
+          <input type="hidden" id="c-lat"><input type="hidden" id="c-lng">
+        </div>
+        <div class="field"><label>Notas</label><textarea id="c-notas" placeholder="Observaciones del cliente..."></textarea></div>
+        <button class="btn btn-primary" onclick="guardarCliente()">Guardar cliente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== INVENTARIO ===== -->
+  <div id="sec-inventario" class="section">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(this,'ti-prod')">Productos</button>
+      <button class="tab" onclick="switchTab(this,'ti-nuevo')">+ Producto</button>
+      <button class="tab" onclick="switchTab(this,'ti-cargar')">Importar</button>
+      <button class="tab" onclick="switchTab(this,'ti-mov')">Movimientos</button>
+    </div>
+    <div id="ti-prod">
+      <div class="search-wrap">
+        <span class="search-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></span>
+        <input type="search" placeholder="Buscar producto..." oninput="filtrarProductos(this.value)" style="padding-left:36px">
+      </div>
+      <div class="card" id="productos-lista"></div>
+    </div>
+    <div id="ti-nuevo" style="display:none">
+      <div class="card">
+        <div class="card-title">Nuevo producto</div>
+        <div class="field"><label>Nombre del producto *</label><input id="p-nombre" placeholder="Ej: Arroz Diana 1kg"></div>
+        <div class="field"><label>Código / Referencia</label><input id="p-codigo" placeholder="Ej: ARR-001"></div>
+        <div class="field-row">
+          <div class="field"><label>Precio (COP) *</label><input id="p-precio" type="number" placeholder="0"></div>
+          <div class="field"><label>Stock inicial</label><input id="p-stock" type="number" placeholder="0"></div>
+        </div>
+        <div class="field"><label>Stock mínimo alerta</label><input id="p-stock-min" type="number" placeholder="5"></div>
+        <div class="field"><label>Categoría</label><input id="p-categoria" placeholder="Ej: Alimentos, Bebidas..."></div>
+        <button class="btn btn-primary" onclick="guardarProducto()">Guardar producto</button>
+      </div>
+    </div>
+    <div id="ti-cargar" style="display:none">
+      <div class="card">
+        <div class="card-title">Importar desde archivo</div>
+        <div class="upload-box" onclick="document.getElementById('file-input').click()">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+          <div style="font-weight:500;margin-bottom:4px">Subir archivo CSV o Excel</div>
+          <div style="font-size:11px">Columnas: nombre, precio, stock, codigo, categoria</div>
+        </div>
+        <input type="file" id="file-input" accept=".csv,.xlsx,.xls" style="display:none" onchange="importarCSV(event)">
+        <div style="margin:12px 0;text-align:center;font-size:12px;color:var(--texto-2)">— o —</div>
+        <div class="field"><label>Pegar datos CSV directamente</label>
+          <textarea id="csv-paste" placeholder="nombre,precio,stock,codigo&#10;Arroz Diana 1kg,3200,100,ARR-001&#10;Aceite 1L,12500,50,ACE-001" style="height:120px;font-family:'DM Mono',monospace;font-size:12px"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="importarCSVTexto()">Importar productos</button>
+        <button class="btn btn-secondary" style="margin-top:8px" onclick="descargarPlantilla()">Descargar plantilla CSV</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Vincular Google Sheets</div>
+        <div class="field"><label>URL de tu hoja de cálculo</label><input id="gs-url-inv" placeholder="https://docs.google.com/spreadsheets/d/..."></div>
+        <button class="btn btn-secondary" onclick="toast('Para sincronizar con Google Sheets, ve a Configuración y agrega tu API key.')">Ver instrucciones</button>
+      </div>
+    </div>
+    <div id="ti-mov" style="display:none">
+      <div class="card">
+        <div class="card-title">Registrar movimiento</div>
+        <div class="field"><label>Tipo</label>
+          <select id="mov-tipo"><option value="entrada">Entrada (compra / recepción)</option><option value="salida">Salida (ajuste manual)</option></select>
+        </div>
+        <div class="field"><label>Producto</label>
+          <select id="mov-producto"></select>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Cantidad</label><input id="mov-qty" type="number" placeholder="0" min="1"></div>
+          <div class="field"><label>Fecha</label><input id="mov-fecha" type="date"></div>
+        </div>
+        <div class="field"><label>Proveedor / Notas</label><input id="mov-notas" placeholder="Opcional"></div>
+        <button class="btn btn-primary" onclick="registrarMovimiento()">Registrar movimiento</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Historial reciente</div>
+        <div id="movimientos-lista"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FACTURAR ===== -->
+  <div id="sec-facturar" class="section">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(this,'tf-nueva')">Nueva factura</button>
+      <button class="tab" onclick="switchTab(this,'tf-historial')">Historial</button>
+    </div>
+    <div id="tf-nueva">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div>
+            <div style="font-size:18px;font-weight:700;color:var(--verde)" id="f-num">Factura #001</div>
+            <div style="font-size:12px;color:var(--texto-2)" id="f-fecha"></div>
+          </div>
+          <span class="badge badge-yellow">Borrador</span>
+        </div>
+        <div class="field"><label>Cliente *</label>
+          <select id="f-cliente" onchange="seleccionarCliente(this.value)">
+            <option value="">— Seleccionar cliente —</option>
+          </select>
+        </div>
+        <div id="f-cliente-info" style="display:none;font-size:12px;color:var(--texto-2);background:var(--fondo);padding:8px;border-radius:var(--radio-sm);margin-top:-6px;margin-bottom:8px"></div>
+        <div class="field-row">
+          <div class="field"><label>% IVA</label>
+            <select id="f-iva">
+              <option value="0">0% (Exento)</option>
+              <option value="5">5%</option>
+              <option value="19" selected>19%</option>
+            </select>
+          </div>
+          <div class="field"><label>Forma de pago</label>
+            <select id="f-pago">
+              <option>Efectivo</option><option>Transferencia</option><option>Nequi</option><option>Daviplata</option><option>Crédito</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Productos en la factura</div>
+        <div id="f-items"></div>
+        <div style="margin-top:10px">
+          <button class="btn btn-secondary" onclick="showModal('modal-agregar-prod')" style="font-size:13px;padding:9px">+ Agregar producto</button>
+        </div>
+        <div class="total-bar" id="f-totales" style="display:none">
+          <div class="total-row"><span>Subtotal</span><span class="total-num" id="f-subtotal">$0</span></div>
+          <div class="total-row"><span>IVA (<span id="f-iva-pct">19</span>%)</span><span class="total-num" id="f-iva-val">$0</span></div>
+          <div class="total-row main"><span>TOTAL</span><span class="total-num" id="f-total">$0</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="field"><label>Notas / Observaciones</label><textarea id="f-notas" placeholder="Ej: Entrega en tienda, condiciones especiales..."></textarea></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+        <button class="btn btn-secondary" onclick="guardarFactura()">Guardar</button>
+        <button class="btn btn-primary" onclick="imprimirFactura()">Imprimir / PDF</button>
+      </div>
+    </div>
+
+    <div id="tf-historial" style="display:none">
+      <div class="card" id="facturas-historial"></div>
+    </div>
+  </div>
+
+  <!-- ===== CONFIG ===== -->
+  <div id="sec-config" class="section">
+    <div class="card">
+      <div class="card-title">Mi empresa</div>
+      <div class="field"><label>Nombre del negocio</label><input id="cfg-empresa" placeholder="Mi Negocio SAS"></div>
+      <div class="field"><label>NIT / RUT</label><input id="cfg-nit" placeholder="900.123.456-1"></div>
+      <div class="field"><label>Teléfono</label><input id="cfg-tel" placeholder="+57 310 000 0000"></div>
+      <div class="field"><label>Email</label><input id="cfg-email" type="email" placeholder="info@minegocio.com"></div>
+      <div class="field"><label>Dirección</label><input id="cfg-dir" placeholder="Cali, Valle del Cauca"></div>
+      <div class="field"><label>IVA predeterminado (%)</label>
+        <select id="cfg-iva"><option value="0">0%</option><option value="5">5%</option><option value="19" selected>19%</option></select>
+      </div>
+      <div class="field"><label>Prefijo de facturas</label><input id="cfg-prefijo" placeholder="Ej: F- o FAC-" value="F-"></div>
+      <button class="btn btn-primary" onclick="guardarConfig()">Guardar configuración</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Google Sheets</div>
+      <div class="toggle-wrap">
+        <div class="toggle-info">
+          <div class="toggle-label">Sincronizar con Google Sheets</div>
+          <div class="toggle-sub">Exporta clientes, productos y facturas</div>
+        </div>
+        <button class="toggle" id="tog-gs" onclick="toggleSwitch(this)"></button>
+      </div>
+      <div class="field" style="margin-top:12px"><label>URL de tu Google Sheet</label><input id="cfg-gs-url" placeholder="https://docs.google.com/spreadsheets/d/ID/..."></div>
+      <div class="field"><label>ID del Script (Apps Script)</label><input id="cfg-gs-script" placeholder="AKfyc..."></div>
+      <button class="btn btn-secondary" onclick="showModal('modal-gs-ayuda')">Ver instrucciones de conexión</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Integraciones</div>
+      <div class="toggle-wrap">
+        <div class="toggle-info">
+          <div class="toggle-label">WhatsApp Business</div>
+          <div class="toggle-sub">Enviar facturas por WhatsApp</div>
+        </div>
+        <button class="toggle on" id="tog-wa" onclick="toggleSwitch(this)"></button>
+      </div>
+      <div class="toggle-wrap">
+        <div class="toggle-info">
+          <div class="toggle-label">CRM / Formularios</div>
+          <div class="toggle-sub">Captura de leads automática</div>
+        </div>
+        <button class="toggle" id="tog-crm" onclick="toggleSwitch(this)"></button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Impresora térmica ASC38 58mm</div>
+      <div id="cfg-bt-status" class="bt-status desconectado" style="margin-bottom:12px">
+        <div class="bt-dot"></div>
+        <div style="flex:1"><div id="cfg-bt-txt" style="font-weight:500">No conectada</div><div id="cfg-bt-sub" style="font-size:11px;margin-top:1px">ASC38 Bluetooth 58mm</div></div>
+        <button class="btn btn-sm btn-secondary" onclick="conectarBluetoothConfig()" style="width:auto;padding:6px 12px;font-size:12px" id="cfg-bt-btn">Conectar</button>
+      </div>
+      <div class="field"><label>Ancho de papel</label>
+        <select id="cfg-papel"><option value="58" selected>58mm (ASC38)</option><option value="80">80mm</option></select>
+      </div>
+      <div class="toggle-wrap">
+        <div class="toggle-info"><div class="toggle-label">Corte automático de papel</div><div class="toggle-sub">Enviar comando de corte al imprimir</div></div>
+        <button class="toggle on" id="tog-corte" onclick="toggleSwitch(this)"></button>
+      </div>
+      <div class="toggle-wrap">
+        <div class="toggle-info"><div class="toggle-label">Imprimir logo en ticket</div><div class="toggle-sub">Mostrar nombre empresa en grande</div></div>
+        <button class="toggle on" id="tog-logo-ticket" onclick="toggleSwitch(this)"></button>
+      </div>
+      <div class="toggle-wrap">
+        <div class="toggle-info"><div class="toggle-label">Pie de página personalizado</div><div class="toggle-sub">Mensaje al final del ticket</div></div>
+        <button class="toggle" id="tog-pie" onclick="toggleSwitch(this)"></button>
+      </div>
+      <div class="field" style="margin-top:10px"><label>Texto de pie de página</label><input id="cfg-pie" placeholder="Ej: ¡Gracias por su compra! Vuelva pronto."></div>
+      <button class="btn btn-primary" onclick="guardarConfigImpresora()">Guardar configuración impresora</button>
+      <button class="btn btn-secondary" style="margin-top:8px" onclick="imprimirTicketPrueba()">Imprimir ticket de prueba</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Datos</div>
+      <button class="btn btn-secondary" onclick="exportarTodo()" style="margin-bottom:8px">Exportar todo como JSON</button>
+      <button class="btn btn-danger" onclick="if(confirm('¿Borrar TODOS los datos? Esta acción no se puede deshacer.')) resetearDatos()">Restablecer datos</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Agregar producto a factura -->
+<div class="modal-overlay" id="modal-agregar-prod">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div class="modal-title" style="margin:0">Agregar producto</div>
+      <button class="modal-close" onclick="closeModal('modal-agregar-prod')">✕</button>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></span>
+      <input type="search" id="modal-search-prod" placeholder="Buscar producto..." oninput="filtrarModalProductos(this.value)" style="padding-left:36px">
+    </div>
+    <div id="modal-prod-lista" style="max-height:360px;overflow-y:auto"></div>
+  </div>
+</div>
+
+<!-- MODAL: Ayuda Google Sheets -->
+<div class="modal-overlay" id="modal-gs-ayuda">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div class="modal-title" style="margin:0">Conectar Google Sheets</div>
+      <button class="modal-close" onclick="closeModal('modal-gs-ayuda')">✕</button>
+    </div>
+    <ol style="font-size:13px;color:var(--texto-2);line-height:2;padding-left:18px">
+      <li>Ve a <strong style="color:var(--texto)">sheets.google.com</strong> y crea una hoja nueva.</li>
+      <li>En el menú: <strong style="color:var(--texto)">Extensiones → Apps Script</strong>.</li>
+      <li>Pega el código del script que encuentras abajo.</li>
+      <li>Haz clic en <strong style="color:var(--texto)">Implementar → Nueva implementación → Aplicación web</strong>.</li>
+      <li>Elige <strong style="color:var(--texto)">Ejecutar como: Yo mismo</strong> y <strong style="color:var(--texto)">Quién tiene acceso: Cualquier persona</strong>.</li>
+      <li>Copia la URL generada y pégala en la configuración de esta app.</li>
+    </ol>
+    <div style="background:var(--fondo);border-radius:var(--radio-sm);padding:12px;font-size:11px;font-family:'DM Mono',monospace;color:var(--texto-2);margin-top:12px;overflow-x:auto;white-space:pre">function doPost(e){
+  var data = JSON.parse(e.postData.contents);
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(data.hoja) 
+    || ss.insertSheet(data.hoja);
+  sheet.appendRow(data.fila);
+  return ContentService
+    .createTextOutput(JSON.stringify({ok:true}))
+    .setMimeType(ContentService.MimeType.JSON);
+}</div>
+    <button class="btn btn-primary" style="margin-top:14px" onclick="closeModal('modal-gs-ayuda')">Entendido</button>
+  </div>
+</div>
+
+<!-- MODAL: Ayuda general -->
+<div class="modal-overlay" id="modal-ayuda">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div class="modal-title" style="margin:0">Cómo usar FacturaFácil</div>
+      <button class="modal-close" onclick="closeModal('modal-ayuda')">✕</button>
+    </div>
+    <div style="font-size:13px;color:var(--texto-2);line-height:1.8">
+      <p style="margin-bottom:10px"><strong style="color:var(--texto)">1. Configura tu empresa</strong><br>Ve a Config y llena los datos de tu negocio primero.</p>
+      <p style="margin-bottom:10px"><strong style="color:var(--texto)">2. Carga tus productos</strong><br>En Inventario → Importar, sube un CSV o escribe los datos directamente.</p>
+      <p style="margin-bottom:10px"><strong style="color:var(--texto)">3. Registra clientes</strong><br>En Clientes → Nuevo, llena los datos y georreferencia la ubicación.</p>
+      <p style="margin-bottom:10px"><strong style="color:var(--texto)">4. Crea facturas</strong><br>En Facturar, selecciona cliente, agrega productos y presiona Imprimir.</p>
+      <p><strong style="color:var(--texto)">5. Sincroniza con Google Sheets</strong><br>En Config → Google Sheets, sigue las instrucciones para conectar tu hoja.</p>
+    </div>
+    <button class="btn btn-primary" style="margin-top:14px" onclick="closeModal('modal-ayuda')">Cerrar</button>
+  </div>
+</div>
+
+<!-- MODAL: Ver factura -->
+<div class="modal-overlay" id="modal-ver-factura">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div class="modal-title" style="margin:0">Factura</div>
+      <button class="modal-close" onclick="closeModal('modal-ver-factura')">✕</button>
+    </div>
+    <div class="tabs" style="margin-bottom:14px">
+      <button class="tab active" onclick="switchTabModal(this,'mv-normal')">Vista normal</button>
+      <button class="tab" onclick="switchTabModal(this,'mv-ticket')">🖨 Ticket 58mm</button>
+    </div>
+    <div id="mv-normal">
+      <div id="modal-factura-content"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+        <button class="btn btn-secondary" onclick="compartirWhatsApp()">WhatsApp</button>
+        <button class="btn btn-primary" onclick="window.print()">Imprimir</button>
+      </div>
+    </div>
+    <div id="mv-ticket" style="display:none">
+      <div id="bt-status-bar" class="bt-status desconectado">
+        <div class="bt-dot"></div>
+        <div style="flex:1"><div id="bt-status-txt" style="font-weight:500">Impresora desconectada</div><div id="bt-status-sub" style="font-size:11px;margin-top:1px">ASC38 58mm no vinculada</div></div>
+        <button class="btn btn-sm btn-secondary no-print" id="bt-btn-conectar" onclick="conectarBluetooth()" style="width:auto;padding:6px 12px;font-size:12px">Conectar</button>
+      </div>
+      <div class="ticket-wrap">
+        <div class="ticket-58" id="ticket-preview"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="btn btn-secondary" onclick="imprimirTicketNavegador()">🖨 Imprimir</button>
+        <button class="btn btn-primary" id="btn-imprimir-bt" onclick="imprimirBluetooth()" disabled style="opacity:.5">📶 BT Imprimir</button>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:var(--texto-2);text-align:center">
+        Web Bluetooth funciona en Chrome/Android. Para iOS usa la app PrinterOn o imprime por WiFi.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== ESTADO =====
+let DB = {
+  clientes: [], productos: [], facturas: [], movimientos: [],
+  config: { empresa:'Mi Negocio', nit:'', tel:'', email:'', dir:'Cali, Colombia', iva:19, prefijo:'F-', gsUrl:'', gsScript:'' },
+  seq: { facturas:1 }
+};
+let facturaActual = { items:[], clienteId:null };
+let facturaViendoId = null;
+
+// ===== STORAGE =====
+function save(){ try{ localStorage.setItem('ff_db', JSON.stringify(DB)); }catch(e){} }
+function load(){
+  try{
+    const d = localStorage.getItem('ff_db');
+    if(d){ DB = {...DB, ...JSON.parse(d)}; DB.seq = DB.seq||{facturas:1}; }
+  }catch(e){}
+}
+
+// ===== UTILS =====
+function cop(n){ return 'COP '+n.toLocaleString('es-CO',{minimumFractionDigits:0,maximumFractionDigits:0}); }
+function hoy(){ return new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'}); }
+function hoyISO(){ return new Date().toISOString().split('T')[0]; }
+function initials(s){ return s.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
+function toast(msg, dur=2800){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), dur);
+}
+
+// ===== NAV =====
+function go(id, btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(id==='inicio') renderInicio();
+  if(id==='clientes') renderClientes();
+  if(id==='inventario'){ renderProductos(); renderMovimientos(); populateMovProductos(); }
+  if(id==='facturar'){ renderFacturarClientes(); renderHistorial(); actualizarFechaFactura(); }
+  if(id==='config') cargarConfig();
+}
+
+function switchTab(tab, targetId){
+  const sec = tab.closest('.section');
+  tab.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  const allTabs = ['tc-lista','tc-nuevo','ti-prod','ti-nuevo','ti-cargar','ti-mov','tf-nueva','tf-historial'];
+  allTabs.forEach(id=>{ const el=sec.querySelector('#'+id); if(el) el.style.display='none'; });
+  const el = sec.querySelector('#'+targetId);
+  if(el) el.style.display='block';
+  if(targetId==='tf-historial') renderHistorial();
+  if(targetId==='ti-mov'){ populateMovProductos(); renderMovimientos(); }
+}
+
+// ===== MODALES =====
+function showModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.addEventListener('click', e=>{ if(e.target.classList.contains('modal-overlay')) e.target.classList.remove('open'); });
+
+// ===== INICIO =====
+function renderInicio(){
+  const mes = new Date().getMonth();
+  const factMes = DB.facturas.filter(f=>new Date(f.fecha).getMonth()===mes);
+  const totalMes = factMes.reduce((s,f)=>s+f.total,0);
+  document.getElementById('stats-box').innerHTML = `
+    <div class="stat stat-verde"><div class="stat-val">${cop(totalMes)}</div><div class="stat-lbl">Ventas del mes</div></div>
+    <div class="stat"><div class="stat-val">${factMes.length}</div><div class="stat-lbl">Facturas emitidas</div></div>
+    <div class="stat"><div class="stat-val">${DB.clientes.length}</div><div class="stat-lbl">Clientes</div></div>
+    <div class="stat"><div class="stat-val">${DB.productos.filter(p=>p.stock<=p.stockMin).length}</div><div class="stat-lbl">Stock bajo</div></div>`;
+  const recientes = [...DB.facturas].reverse().slice(0,5);
+  const el = document.getElementById('lista-recientes');
+  if(!recientes.length){ el.innerHTML='<div class="empty"><p>Sin facturas aún</p></div>'; return; }
+  el.innerHTML = recientes.map(f=>{
+    const cl = DB.clientes.find(c=>c.id===f.clienteId)||{establecimiento:'Sin cliente',nombre:''};
+    return `<div class="list-item" onclick="verFactura('${f.id}')">
+      <div class="avatar">${initials(cl.establecimiento||'??')}</div>
+      <div class="list-info"><div class="list-name">${cl.establecimiento}</div><div class="list-sub">${f.fecha} · #${f.numero}</div></div>
+      <span class="badge badge-green">${cop(f.total)}</span>
+    </div>`;
+  }).join('');
+}
+
+// ===== CLIENTES =====
+function guardarCliente(){
+  const est = document.getElementById('c-establecimiento').value.trim();
+  const nom = document.getElementById('c-nombre').value.trim();
+  if(!est||!nom){ toast('Completa los campos obligatorios'); return; }
+  const cl = {
+    id: uid(), establecimiento: est, nombre: nom,
+    apellidos: document.getElementById('c-apellidos').value.trim(),
+    identificacion: document.getElementById('c-id').value.trim(),
+    phone: document.getElementById('c-phone').value.trim(),
+    email: document.getElementById('c-email').value.trim(),
+    direccion: document.getElementById('c-dir').value.trim(),
+    lat: document.getElementById('c-lat').value,
+    lng: document.getElementById('c-lng').value,
+    notas: document.getElementById('c-notas').value.trim(),
+    fecha: hoyISO()
+  };
+  DB.clientes.push(cl); save();
+  syncGS('Clientes', [cl.id, cl.establecimiento, cl.nombre+' '+cl.apellidos, cl.identificacion, cl.phone, cl.email, cl.direccion, cl.lat, cl.lng, cl.fecha]);
+  toast('Cliente guardado ✓');
+  ['c-establecimiento','c-nombre','c-apellidos','c-id','c-phone','c-email','c-dir','c-notas'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('c-lat').value=''; document.getElementById('c-lng').value='';
+  document.getElementById('geo-label').textContent='Tocar para detectar ubicación GPS';
+  renderClientes();
+}
+
+function renderClientes(filtro=''){
+  const lista = DB.clientes.filter(c=>!filtro||c.establecimiento.toLowerCase().includes(filtro)||c.nombre.toLowerCase().includes(filtro));
+  const el = document.getElementById('clientes-lista');
+  if(!lista.length){ el.innerHTML='<div class="empty"><p>'+(filtro?'Sin resultados':'Sin clientes registrados')+'</p></div>'; return; }
+  el.innerHTML = lista.map(c=>`
+    <div class="list-item">
+      <div class="avatar">${initials(c.establecimiento||'??')}</div>
+      <div class="list-info">
+        <div class="list-name">${c.establecimiento}</div>
+        <div class="list-sub">${c.nombre} ${c.apellidos} · ${c.phone||c.email||'Sin contacto'}</div>
+      </div>
+      <span class="badge badge-green">Activo</span>
+    </div>`).join('');
+}
+
+function filtrarClientes(v){ renderClientes(v.toLowerCase()); }
+
+function geolocate(){
+  if(!navigator.geolocation){ toast('GPS no disponible en este dispositivo'); return; }
+  document.getElementById('geo-label').textContent='Detectando ubicación...';
+  navigator.geolocation.getCurrentPosition(pos=>{
+    document.getElementById('c-lat').value = pos.coords.latitude.toFixed(6);
+    document.getElementById('c-lng').value = pos.coords.longitude.toFixed(6);
+    document.getElementById('geo-label').textContent = `📍 ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+    toast('Ubicación detectada ✓');
+  }, ()=>{ document.getElementById('geo-label').textContent='Error al detectar. Intenta de nuevo.'; toast('No se pudo obtener la ubicación'); });
+}
+
+// ===== PRODUCTOS =====
+function guardarProducto(){
+  const nom = document.getElementById('p-nombre').value.trim();
+  const precio = parseFloat(document.getElementById('p-precio').value)||0;
+  if(!nom||!precio){ toast('Nombre y precio son obligatorios'); return; }
+  const p = {
+    id: uid(), nombre: nom,
+    codigo: document.getElementById('p-codigo').value.trim(),
+    precio: precio,
+    stock: parseInt(document.getElementById('p-stock').value)||0,
+    stockMin: parseInt(document.getElementById('p-stock-min').value)||5,
+    categoria: document.getElementById('p-categoria').value.trim(),
+    fecha: hoyISO()
+  };
+  DB.productos.push(p); save();
+  syncGS('Productos', [p.id, p.nombre, p.codigo, p.precio, p.stock, p.stockMin, p.categoria, p.fecha]);
+  toast('Producto guardado ✓');
+  ['p-nombre','p-codigo','p-precio','p-stock','p-stock-min','p-categoria'].forEach(id=>document.getElementById(id).value='');
+  renderProductos();
+}
+
+function renderProductos(filtro=''){
+  const lista = DB.productos.filter(p=>!filtro||p.nombre.toLowerCase().includes(filtro)||p.codigo.toLowerCase().includes(filtro));
+  const el = document.getElementById('productos-lista');
+  if(!lista.length){ el.innerHTML='<div class="empty"><p>'+(filtro?'Sin resultados':'Sin productos. Agrega o importa uno.')+'</p></div>'; return; }
+  el.innerHTML = lista.map(p=>{
+    const badge = p.stock<=0?'badge-red':(p.stock<=p.stockMin?'badge-yellow':'badge-green');
+    return `<div class="prod-row">
+      <div style="flex:1;min-width:0">
+        <div class="prod-name">${p.nombre}</div>
+        <div class="prod-detail">${p.codigo||'Sin código'} · ${p.categoria||'General'}</div>
+      </div>
+      <span class="badge ${badge}">${p.stock} u.</span>
+      <div class="prod-price">${cop(p.precio)}</div>
+    </div>`;
+  }).join('');
+}
+
+function filtrarProductos(v){ renderProductos(v.toLowerCase()); }
+
+function importarCSV(e){
+  const f = e.target.files[0]; if(!f) return;
+  const reader = new FileReader();
+  reader.onload = ev => procesarCSV(ev.target.result);
+  reader.readAsText(f, 'UTF-8');
+}
+
+function importarCSVTexto(){
+  const txt = document.getElementById('csv-paste').value.trim();
+  if(!txt){ toast('Pega datos CSV primero'); return; }
+  procesarCSV(txt);
+}
+
+function procesarCSV(txt){
+  const lines = txt.trim().split('\n');
+  const header = lines[0].toLowerCase().split(',').map(h=>h.trim().replace(/"/g,''));
+  let count = 0;
+  for(let i=1;i<lines.length;i++){
+    const vals = lines[i].split(',').map(v=>v.trim().replace(/"/g,''));
+    if(!vals[0]) continue;
+    const idx = k => header.indexOf(k);
+    const get = (k,def='') => idx(k)>=0?vals[idx(k)]||def:def;
+    DB.productos.push({ id:uid(), nombre:get('nombre'), codigo:get('codigo')||get('código'), precio:parseFloat(get('precio'))||0, stock:parseInt(get('stock'))||0, stockMin:parseInt(get('stock_min','5'))||5, categoria:get('categoria'), fecha:hoyISO() });
+    count++;
+  }
+  save(); renderProductos();
+  toast(`${count} productos importados ✓`);
+  document.getElementById('csv-paste').value='';
+}
+
+function descargarPlantilla(){
+  const csv = 'nombre,precio,stock,codigo,categoria\nArroz Diana 1kg,3200,100,ARR-001,Alimentos\nAceite Girasol 1L,12500,50,ACE-001,Alimentos';
+  const a = document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download='plantilla_productos.csv'; a.click();
+}
+
+// ===== MOVIMIENTOS =====
+function populateMovProductos(){
+  const sel = document.getElementById('mov-producto');
+  sel.innerHTML = DB.productos.map(p=>`<option value="${p.id}">${p.nombre} (${p.stock} u.)</option>`).join('');
+  document.getElementById('mov-fecha').value = hoyISO();
+}
+
+function registrarMovimiento(){
+  const tipo = document.getElementById('mov-tipo').value;
+  const prodId = document.getElementById('mov-producto').value;
+  const qty = parseInt(document.getElementById('mov-qty').value)||0;
+  if(!prodId||!qty){ toast('Selecciona producto y cantidad'); return; }
+  const prod = DB.productos.find(p=>p.id===prodId);
+  if(!prod){ toast('Producto no encontrado'); return; }
+  if(tipo==='salida'&&prod.stock<qty){ toast('Stock insuficiente'); return; }
+  prod.stock += tipo==='entrada'?qty:-qty;
+  DB.movimientos.push({ id:uid(), tipo, prodId, prodNombre:prod.nombre, qty, fecha:document.getElementById('mov-fecha').value, notas:document.getElementById('mov-notas').value.trim() });
+  save(); renderMovimientos(); populateMovProductos();
+  document.getElementById('mov-qty').value=''; document.getElementById('mov-notas').value='';
+  toast('Movimiento registrado ✓');
+}
+
+function renderMovimientos(){
+  const el = document.getElementById('movimientos-lista');
+  const lista = [...DB.movimientos].reverse().slice(0,10);
+  if(!lista.length){ el.innerHTML='<div class="empty"><p>Sin movimientos</p></div>'; return; }
+  el.innerHTML = lista.map(m=>`
+    <div class="prod-row">
+      <div style="flex:1"><div class="prod-name">${m.prodNombre}</div><div class="prod-detail">${m.fecha} · ${m.notas||''}</div></div>
+      <span class="badge ${m.tipo==='entrada'?'badge-green':'badge-yellow'}">${m.tipo==='entrada'?'+':'-'}${m.qty}</span>
+    </div>`).join('');
+}
+
+// ===== FACTURAR =====
+function actualizarFechaFactura(){
+  document.getElementById('f-fecha').textContent = hoy();
+  document.getElementById('f-num').textContent = 'Factura #'+String(DB.seq.facturas).padStart(3,'0');
+  document.getElementById('f-iva').value = DB.config.iva||19;
+  document.getElementById('f-iva-pct').textContent = DB.config.iva||19;
+  document.getElementById('f-iva').onchange = function(){ document.getElementById('f-iva-pct').textContent=this.value; recalcularTotales(); };
+}
+
+function renderFacturarClientes(){
+  const sel = document.getElementById('f-cliente');
+  sel.innerHTML = '<option value="">— Seleccionar cliente —</option>' + DB.clientes.map(c=>`<option value="${c.id}">${c.establecimiento} — ${c.nombre} ${c.apellidos}</option>`).join('');
+}
+
+function seleccionarCliente(id){
+  facturaActual.clienteId = id;
+  const info = document.getElementById('f-cliente-info');
+  if(!id){ info.style.display='none'; return; }
+  const cl = DB.clientes.find(c=>c.id===id);
+  if(cl){ info.style.display='block'; info.textContent = `${cl.nombre} ${cl.apellidos} · ${cl.identificacion||''} · ${cl.phone||''} · ${cl.direccion||''}`; }
+}
+
+function nuevaFactura(){
+  facturaActual = { items:[], clienteId:null };
+  document.getElementById('f-cliente').value='';
+  document.getElementById('f-cliente-info').style.display='none';
+  document.getElementById('f-notas').value='';
+  renderItemsFactura();
+}
+
+function filtrarModalProductos(v){
+  renderModalProductos(v.toLowerCase());
+}
+
+function showModal(id){
+  document.getElementById(id).classList.add('open');
+  if(id==='modal-agregar-prod'){ document.getElementById('modal-search-prod').value=''; renderModalProductos(''); }
+}
+
+function renderModalProductos(filtro){
+  const lista = DB.productos.filter(p=>!filtro||p.nombre.toLowerCase().includes(filtro)||p.codigo.toLowerCase().includes(filtro));
+  const el = document.getElementById('modal-prod-lista');
+  if(!lista.length){ el.innerHTML='<div class="empty"><p>Sin productos</p></div>'; return; }
+  el.innerHTML = lista.map(p=>`
+    <div class="prod-row" style="cursor:pointer" onclick="agregarItemFactura('${p.id}')">
+      <div style="flex:1"><div class="prod-name">${p.nombre}</div><div class="prod-detail">${p.codigo||''} · Stock: ${p.stock}</div></div>
+      <div class="prod-price">${cop(p.precio)}</div>
+    </div>`).join('');
+}
+
+function agregarItemFactura(prodId){
+  const prod = DB.productos.find(p=>p.id===prodId); if(!prod) return;
+  const exist = facturaActual.items.find(i=>i.prodId===prodId);
+  if(exist){ exist.qty++; } else { facturaActual.items.push({ prodId, nombre:prod.nombre, precio:prod.precio, qty:1 }); }
+  renderItemsFactura(); closeModal('modal-agregar-prod');
+  toast(prod.nombre+' agregado');
+}
+
+function cambiarQtyItem(prodId, delta){
+  const item = facturaActual.items.find(i=>i.prodId===prodId); if(!item) return;
+  item.qty += delta;
+  if(item.qty<=0) facturaActual.items = facturaActual.items.filter(i=>i.prodId!==prodId);
+  renderItemsFactura();
+}
+
+function renderItemsFactura(){
+  const el = document.getElementById('f-items');
+  if(!facturaActual.items.length){ el.innerHTML='<div style="text-align:center;padding:20px;color:var(--texto-2);font-size:13px">Sin productos aún</div>'; document.getElementById('f-totales').style.display='none'; return; }
+  el.innerHTML = facturaActual.items.map(i=>`
+    <div class="prod-row">
+      <div style="flex:1;min-width:0"><div class="prod-name">${i.nombre}</div><div class="prod-detail">${cop(i.precio)} c/u</div></div>
+      <div class="qty">
+        <button class="qty-btn" onclick="cambiarQtyItem('${i.prodId}',-1)">−</button>
+        <span class="qty-val">${i.qty}</span>
+        <button class="qty-btn" onclick="cambiarQtyItem('${i.prodId}',1)">+</button>
+      </div>
+      <div class="prod-price">${cop(i.precio*i.qty)}</div>
+    </div>`).join('');
+  recalcularTotales();
+}
+
+function recalcularTotales(){
+  const subtotal = facturaActual.items.reduce((s,i)=>s+i.precio*i.qty,0);
+  const ivaPct = parseFloat(document.getElementById('f-iva').value)||0;
+  const iva = Math.round(subtotal*ivaPct/100);
+  const total = subtotal+iva;
+  facturaActual.subtotal=subtotal; facturaActual.iva=iva; facturaActual.ivaPct=ivaPct; facturaActual.total=total;
+  document.getElementById('f-subtotal').textContent = cop(subtotal);
+  document.getElementById('f-iva-val').textContent = cop(iva);
+  document.getElementById('f-total').textContent = cop(total);
+  document.getElementById('f-totales').style.display='block';
+}
+
+function guardarFactura(){
+  if(!facturaActual.clienteId){ toast('Selecciona un cliente'); return; }
+  if(!facturaActual.items.length){ toast('Agrega al menos un producto'); return; }
+  recalcularTotales();
+  const f = {
+    id: uid(),
+    numero: DB.config.prefijo+String(DB.seq.facturas).padStart(3,'0'),
+    clienteId: facturaActual.clienteId,
+    items: [...facturaActual.items],
+    subtotal: facturaActual.subtotal,
+    ivaPct: facturaActual.ivaPct,
+    iva: facturaActual.iva,
+    total: facturaActual.total,
+    pago: document.getElementById('f-pago').value,
+    notas: document.getElementById('f-notas').value,
+    fecha: hoyISO(),
+    estado: 'emitida'
+  };
+  // Descontar stock
+  f.items.forEach(item=>{
+    const p = DB.productos.find(pr=>pr.id===item.prodId);
+    if(p) p.stock = Math.max(0, p.stock-item.qty);
+  });
+  DB.facturas.push(f); DB.seq.facturas++;
+  save();
+  syncGS('Facturas', [f.id, f.numero, f.fecha, DB.clientes.find(c=>c.id===f.clienteId)?.establecimiento||'', f.subtotal, f.iva, f.total, f.pago, f.estado]);
+  toast('Factura '+f.numero+' guardada ✓');
+  nuevaFactura();
+  actualizarFechaFactura();
+}
+
+function imprimirFactura(){
+  if(!facturaActual.clienteId){ toast('Selecciona un cliente'); return; }
+  if(!facturaActual.items.length){ toast('Agrega productos'); return; }
+  guardarFactura();
+  const fId = DB.facturas[DB.facturas.length-1];
+  verFactura(fId.id);
+}
+
+function verFactura(id){
+  const f = DB.facturas.find(x=>x.id===id); if(!f) return;
+  const cl = DB.clientes.find(c=>c.id===f.clienteId)||{establecimiento:'Cliente',nombre:'',apellidos:'',identificacion:'',direccion:''};
+  const cfg = DB.config;
+  document.getElementById('modal-factura-content').innerHTML = `
+    <div class="factura-preview" id="factura-print-area">
+      <div class="factura-head">
+        <div><div class="factura-empresa">${cfg.empresa||'Mi Negocio'}</div><div style="font-size:11px;color:var(--texto-2)">${cfg.nit||''}<br>${cfg.dir||''}<br>${cfg.tel||''}</div></div>
+        <div class="factura-num"><div style="font-size:16px;font-weight:700;color:var(--verde)">${f.numero}</div><div>${f.fecha}</div><div style="margin-top:4px"><span class="badge badge-green">Emitida</span></div></div>
+      </div>
+      <div class="factura-divider"></div>
+      <div class="factura-cliente"><strong>${cl.establecimiento}</strong>${cl.nombre} ${cl.apellidos}<br>${cl.identificacion||''} ${cl.direccion?'· '+cl.direccion:''}</div>
+      <table class="factura-table">
+        <thead><tr><th>Producto</th><th>Cant.</th><th>V. Unit.</th><th>Total</th></tr></thead>
+        <tbody>${f.items.map(i=>`<tr><td>${i.nombre}</td><td>${i.qty}</td><td>${cop(i.precio)}</td><td>${cop(i.precio*i.qty)}</td></tr>`).join('')}</tbody>
+      </table>
+      <div class="factura-divider"></div>
+      <div style="text-align:right;font-size:13px">
+        <div style="color:var(--texto-2);margin-bottom:3px">Subtotal: <strong>${cop(f.subtotal)}</strong></div>
+        <div style="color:var(--texto-2);margin-bottom:3px">IVA (${f.ivaPct}%): <strong>${cop(f.iva)}</strong></div>
+        <div style="font-size:16px;font-weight:700;color:var(--verde)">TOTAL: ${cop(f.total)}</div>
+      </div>
+      ${f.notas?`<div style="margin-top:10px;font-size:12px;color:var(--texto-2);border-top:1px solid var(--borde);padding-top:8px">${f.notas}</div>`:''}
+      <div style="margin-top:14px;text-align:center;font-size:10px;color:var(--texto-2)">Forma de pago: ${f.pago} · Generado con FacturaFácil</div>
+    </div>`;
+  facturaViendoId = id;
+  showModal('modal-ver-factura');
+}
+
+function compartirWhatsApp(){
+  if(!facturaViendoId) return;
+  const f = DB.facturas.find(x=>x.id===facturaViendoId); if(!f) return;
+  const cl = DB.clientes.find(c=>c.id===f.clienteId)||{establecimiento:'',phone:''};
+  const texto = `*${DB.config.empresa||'Mi Negocio'}*\nFactura: ${f.numero}\nFecha: ${f.fecha}\nCliente: ${cl.establecimiento}\n\n${f.items.map(i=>`• ${i.nombre} x${i.qty} = ${cop(i.precio*i.qty)}`).join('\n')}\n\nSubtotal: ${cop(f.subtotal)}\nIVA (${f.ivaPct}%): ${cop(f.iva)}\n*TOTAL: ${cop(f.total)}*\nForma de pago: ${f.pago}`;
+  const phone = cl.phone?cl.phone.replace(/\D/g,''):'';
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(texto)}`,'_blank');
+}
+
+function renderHistorial(){
+  const el = document.getElementById('facturas-historial');
+  const lista = [...DB.facturas].reverse();
+  if(!lista.length){ el.innerHTML='<div class="empty"><p>Sin facturas guardadas</p></div>'; return; }
+  el.innerHTML = lista.map(f=>{
+    const cl = DB.clientes.find(c=>c.id===f.clienteId)||{establecimiento:'Sin cliente'};
+    return `<div class="list-item" onclick="verFactura('${f.id}')">
+      <div class="avatar">${initials(cl.establecimiento||'??')}</div>
+      <div class="list-info"><div class="list-name">${f.numero} — ${cl.establecimiento}</div><div class="list-sub">${f.fecha} · ${f.pago}</div></div>
+      <span class="badge badge-green">${cop(f.total)}</span>
+    </div>`;
+  }).join('');
+}
+
+// ===== CONFIG =====
+function cargarConfig(){
+  const c = DB.config;
+  document.getElementById('cfg-empresa').value = c.empresa||'';
+  document.getElementById('cfg-nit').value = c.nit||'';
+  document.getElementById('cfg-tel').value = c.tel||'';
+  document.getElementById('cfg-email').value = c.email||'';
+  document.getElementById('cfg-dir').value = c.dir||'';
+  document.getElementById('cfg-iva').value = c.iva||19;
+  document.getElementById('cfg-prefijo').value = c.prefijo||'F-';
+  document.getElementById('cfg-gs-url').value = c.gsUrl||'';
+  document.getElementById('cfg-gs-script').value = c.gsScript||'';
+}
+
+function guardarConfig(){
+  DB.config = {
+    ...DB.config,
+    empresa: document.getElementById('cfg-empresa').value.trim(),
+    nit: document.getElementById('cfg-nit').value.trim(),
+    tel: document.getElementById('cfg-tel').value.trim(),
+    email: document.getElementById('cfg-email').value.trim(),
+    dir: document.getElementById('cfg-dir').value.trim(),
+    iva: parseInt(document.getElementById('cfg-iva').value)||19,
+    prefijo: document.getElementById('cfg-prefijo').value.trim()||'F-',
+    gsUrl: document.getElementById('cfg-gs-url').value.trim(),
+    gsScript: document.getElementById('cfg-gs-script').value.trim()
+  };
+  save();
+  document.getElementById('empresa-nombre-header').textContent = DB.config.empresa||'Mi Negocio';
+  toast('Configuración guardada ✓');
+}
+
+function toggleSwitch(btn){ btn.classList.toggle('on'); }
+
+// ===== IMPRESORA BLUETOOTH ASC38 58mm =====
+let btDevice = null;
+let btCharacteristic = null;
+const BT_SERVICE = '000018f0-0000-1000-8000-00805f9b34fb';
+const BT_CHAR    = '00002af1-0000-1000-8000-00805f9b34fb';
+// ESC/POS commands
+const ESC=0x1B, GS=0x1D;
+const CMD = {
+  init:       [ESC,0x40],
+  alignLeft:  [ESC,0x61,0x00],
+  alignCenter:[ESC,0x61,0x01],
+  alignRight: [ESC,0x61,0x02],
+  bold:       [ESC,0x45,0x01],
+  boldOff:    [ESC,0x45,0x00],
+  doubleH:    [ESC,0x21,0x10],
+  normal:     [ESC,0x21,0x00],
+  small:      [ESC,0x21,0x01],
+  feed2:      [ESC,0x64,0x02],
+  feed4:      [ESC,0x64,0x04],
+  cut:        [GS,0x56,0x42,0x00],
+  linebreak:  [0x0A],
+};
+
+function setBtStatus(estado, txt, sub){
+  ['modal-ver-factura','sec-config'].forEach(()=>{});
+  const bars = [document.getElementById('bt-status-bar'), document.getElementById('cfg-bt-status')];
+  const txts = [document.getElementById('bt-status-txt'), document.getElementById('cfg-bt-txt')];
+  const subs = [document.getElementById('bt-status-sub'), document.getElementById('cfg-bt-sub')];
+  bars.forEach(b=>{ if(b){ b.className='bt-status '+estado; } });
+  txts.forEach(t=>{ if(t) t.textContent=txt; });
+  subs.forEach(s=>{ if(s) s.textContent=sub; });
+  const btn = document.getElementById('btn-imprimir-bt');
+  if(btn){ btn.disabled = estado!=='conectado'; btn.style.opacity = estado==='conectado'?'1':'0.5'; }
+}
+
+async function conectarBluetooth(){
+  if(!navigator.bluetooth){ toast('Web Bluetooth no disponible. Usa Chrome en Android.'); return; }
+  setBtStatus('buscando','Buscando ASC38...','Acerca la impresora al celular');
+  try{
+    btDevice = await navigator.bluetooth.requestDevice({
+      filters:[{namePrefix:'ASC'},{namePrefix:'Printer'},{namePrefix:'BT'},{namePrefix:'MPT'}],
+      optionalServices:[BT_SERVICE,'e7810a71-73ae-499d-8c15-faa9aef0c3f2']
+    });
+    btDevice.addEventListener('gattserverdisconnected', ()=>{
+      setBtStatus('desconectado','Impresora desconectada','Reconecta para imprimir');
+      btCharacteristic=null;
+    });
+    const server = await btDevice.gatt.connect();
+    let service;
+    try{ service = await server.getPrimaryService(BT_SERVICE); }
+    catch(e){
+      const services = await server.getPrimaryServices();
+      service = services[0];
+    }
+    const chars = await service.getCharacteristics();
+    btCharacteristic = chars.find(c=>c.properties.write||c.properties.writeWithoutResponse)||chars[0];
+    setBtStatus('conectado','ASC38 conectada','Lista para imprimir · 58mm');
+    toast('Impresora conectada ✓');
+  }catch(e){
+    setBtStatus('desconectado','Sin conexión','Error: '+(e.message||'intenta de nuevo'));
+    if(e.name!=='NotFoundError') toast('Error al conectar: '+e.message);
+  }
+}
+
+async function conectarBluetoothConfig(){ await conectarBluetooth(); }
+
+async function enviarBytes(bytes){
+  if(!btCharacteristic) throw new Error('Impresora no conectada');
+  const CHUNK = 512;
+  for(let i=0;i<bytes.length;i+=CHUNK){
+    const chunk = bytes.slice(i,i+CHUNK);
+    if(btCharacteristic.properties.writeWithoutResponse)
+      await btCharacteristic.writeValueWithoutResponse(new Uint8Array(chunk));
+    else
+      await btCharacteristic.writeValue(new Uint8Array(chunk));
+    await new Promise(r=>setTimeout(r,30));
+  }
+}
+
+function textToBytes(str){
+  const out=[];
+  for(let i=0;i<str.length;i++){
+    const c=str.charCodeAt(i);
+    if(c<128) out.push(c);
+    else if(c<2048){ out.push(0xC0|(c>>6)); out.push(0x80|(c&0x3F)); }
+    else { out.push(0xE0|(c>>12)); out.push(0x80|((c>>6)&0x3F)); out.push(0x80|(c&0x3F)); }
+  }
+  return out;
+}
+
+function padRight(str,len){ return String(str).substring(0,len).padEnd(len,' '); }
+function padLeft(str,len){ return String(str).substring(0,len).padStart(len,' '); }
+
+function construirTicketESCPOS(f){
+  const cl = DB.clientes.find(c=>c.id===f.clienteId)||{establecimiento:'Cliente',nombre:'',apellidos:'',identificacion:'',direccion:''};
+  const cfg = DB.config;
+  const corte = document.getElementById('tog-corte')?.classList.contains('on');
+  const pie = document.getElementById('tog-pie')?.classList.contains('on');
+  const pieTxt = document.getElementById('cfg-pie')?.value || '¡Gracias por su compra!';
+  const W = 32; // caracteres en 58mm
+  let bytes = [...CMD.init];
+
+  // Encabezado empresa
+  bytes.push(...CMD.alignCenter,...CMD.bold,...CMD.doubleH);
+  bytes.push(...textToBytes((cfg.empresa||'MI NEGOCIO').toUpperCase().substring(0,16)+'\n'));
+  bytes.push(...CMD.normal,...CMD.boldOff);
+  if(cfg.nit) bytes.push(...textToBytes('NIT: '+cfg.nit+'\n'));
+  if(cfg.tel) bytes.push(...textToBytes('Tel: '+cfg.tel+'\n'));
+  if(cfg.dir) bytes.push(...textToBytes(cfg.dir.substring(0,32)+'\n'));
+
+  bytes.push(...CMD.alignLeft);
+  bytes.push(...textToBytes('='.repeat(W)+'\n'));
+
+  // Número y fecha
+  bytes.push(...CMD.bold);
+  bytes.push(...textToBytes(padRight('FACTURA: '+f.numero,W)+'\n'));
+  bytes.push(...CMD.boldOff);
+  bytes.push(...textToBytes('Fecha: '+f.fecha+'\n'));
+  bytes.push(...textToBytes('Pago:  '+f.pago+'\n'));
+  bytes.push(...textToBytes('-'.repeat(W)+'\n'));
+
+  // Cliente
+  bytes.push(...CMD.bold,...textToBytes('CLIENTE\n'),...CMD.boldOff);
+  bytes.push(...textToBytes((cl.establecimiento).substring(0,W)+'\n'));
+  const nomCl = (cl.nombre+' '+cl.apellidos).trim();
+  if(nomCl) bytes.push(...textToBytes(nomCl.substring(0,W)+'\n'));
+  if(cl.identificacion) bytes.push(...textToBytes('ID: '+cl.identificacion+'\n'));
+  bytes.push(...textToBytes('-'.repeat(W)+'\n'));
+
+  // Encabezado items
+  bytes.push(...CMD.bold);
+  bytes.push(...textToBytes(padRight('Producto',18)+padLeft('Cant',4)+padLeft('Total',10)+'\n'));
+  bytes.push(...CMD.boldOff);
+  bytes.push(...textToBytes('-'.repeat(W)+'\n'));
+
+  // Items
+  f.items.forEach(item=>{
+    const nombre = item.nombre.substring(0,18);
+    const linea1 = padRight(nombre,18)+padLeft(String(item.qty),4)+padLeft(fmtNum(item.precio*item.qty),10);
+    bytes.push(...textToBytes(linea1+'\n'));
+    bytes.push(...CMD.small,...textToBytes('  '+cop(item.precio)+' c/u\n'),...CMD.normal);
+  });
+
+  bytes.push(...textToBytes('='.repeat(W)+'\n'));
+
+  // Totales
+  bytes.push(...textToBytes(padRight('Subtotal:',22)+padLeft(fmtNum(f.subtotal),10)+'\n'));
+  bytes.push(...textToBytes(padRight('IVA ('+f.ivaPct+'%):',22)+padLeft(fmtNum(f.iva),10)+'\n'));
+  bytes.push(...CMD.bold,...CMD.doubleH);
+  bytes.push(...textToBytes(padRight('TOTAL:',W/2)+padLeft(fmtNum(f.total),W/2)+'\n'));
+  bytes.push(...CMD.normal,...CMD.boldOff);
+  bytes.push(...textToBytes('='.repeat(W)+'\n'));
+
+  // Pie
+  bytes.push(...CMD.alignCenter);
+  if(pie && pieTxt) bytes.push(...textToBytes(pieTxt.substring(0,W)+'\n'));
+  bytes.push(...CMD.small,...textToBytes('FacturaFacil · '+hoyISO()+'\n'),...CMD.normal);
+  bytes.push(...CMD.feed4);
+  if(corte) bytes.push(...CMD.cut);
+
+  return bytes;
+}
+
+function fmtNum(n){ return n.toLocaleString('es-CO',{minimumFractionDigits:0,maximumFractionDigits:0}); }
+
+async function imprimirBluetooth(){
+  if(!btCharacteristic){ toast('Conecta primero la impresora'); return; }
+  const f = DB.facturas.find(x=>x.id===facturaViendoId); if(!f) return;
+  try{
+    toast('Enviando a impresora...');
+    const bytes = construirTicketESCPOS(f);
+    await enviarBytes(bytes);
+    toast('Impreso correctamente ✓');
+  }catch(e){ toast('Error al imprimir: '+e.message); }
+}
+
+function imprimirTicketNavegador(){
+  const f = DB.facturas.find(x=>x.id===facturaViendoId); if(!f) return;
+  const html = generarHTMLTicket58(f);
+  const w = window.open('','_blank','width=300,height=600');
+  w.document.write(html); w.document.close();
+  w.onload = ()=>{ w.focus(); w.print(); };
+}
+
+function generarHTMLTicket58(f){
+  const cl = DB.clientes.find(c=>c.id===f.clienteId)||{establecimiento:'',nombre:'',apellidos:'',identificacion:'',direccion:''};
+  const cfg = DB.config;
+  const pie = document.getElementById('tog-pie')?.classList.contains('on');
+  const pieTxt = document.getElementById('cfg-pie')?.value||'¡Gracias por su compra!';
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<style>
+@page{size:58mm auto;margin:2mm 1mm}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Courier New',monospace;font-size:10px;color:#000;width:54mm}
+.c{text-align:center}.r{text-align:right}.b{font-weight:bold}
+.big{font-size:14px;font-weight:bold}
+.small{font-size:8px}
+.line{border-top:1px dashed #000;margin:4px 0}
+.row{display:flex;justify-content:space-between}
+.row .n{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:36mm}
+.row .p{text-align:right;min-width:16mm}
+</style></head><body>
+<div class="c b big">${(cfg.empresa||'MI NEGOCIO').toUpperCase()}</div>
+${cfg.nit?`<div class="c">NIT: ${cfg.nit}</div>`:''}
+${cfg.tel?`<div class="c">${cfg.tel}</div>`:''}
+${cfg.dir?`<div class="c">${cfg.dir}</div>`:''}
+<div class="line"></div>
+<div class="b">FACTURA: ${f.numero}</div>
+<div>Fecha: ${f.fecha}</div>
+<div>Pago:  ${f.pago}</div>
+<div class="line"></div>
+<div class="b">CLIENTE</div>
+<div>${cl.establecimiento}</div>
+${cl.nombre?`<div>${cl.nombre} ${cl.apellidos}</div>`:''}
+${cl.identificacion?`<div>ID: ${cl.identificacion}</div>`:''}
+<div class="line"></div>
+<div class="row b"><span class="n">Producto</span><span class="p">Cant  Total</span></div>
+<div class="line"></div>
+${f.items.map(i=>`<div class="row"><span class="n">${i.nombre}</span><span class="p">${i.qty}  ${fmtNum(i.precio*i.qty)}</span></div><div class="small r">${cop(i.precio)} c/u</div>`).join('')}
+<div class="line"></div>
+<div class="row"><span>Subtotal:</span><span>${fmtNum(f.subtotal)}</span></div>
+<div class="row"><span>IVA (${f.ivaPct}%):</span><span>${fmtNum(f.iva)}</span></div>
+<div class="line"></div>
+<div class="row b big"><span>TOTAL:</span><span>${fmtNum(f.total)}</span></div>
+<div class="line"></div>
+${pie?`<div class="c">${pieTxt}</div>`:''}
+<div class="c small">FacturaFacil · ${hoyISO()}</div>
+<br><br><br>
+</body></html>`;
+}
+
+function renderTicketPreview(facturaId){
+  const f = DB.facturas.find(x=>x.id===facturaId); if(!f) return;
+  const cl = DB.clientes.find(c=>c.id===f.clienteId)||{establecimiento:'',nombre:'',apellidos:'',identificacion:''};
+  const cfg = DB.config;
+  const W=32;
+  const line = (t='')=>`<div>${t}</div>`;
+  const dashed = ()=>`<div>${'-'.repeat(W)}</div>`;
+  const equal = ()=>`<div>${'='.repeat(W)}</div>`;
+  const row=(a,b)=>`<div class="t-row"><span class="t-name">${a}</span><span class="t-amt">${b}</span></div>`;
+  let h='';
+  h+=`<div class="t-center t-logo">${(cfg.empresa||'MI NEGOCIO').toUpperCase()}</div>`;
+  if(cfg.nit) h+=`<div class="t-center">NIT: ${cfg.nit}</div>`;
+  if(cfg.tel) h+=`<div class="t-center">${cfg.tel}</div>`;
+  if(cfg.dir) h+=`<div class="t-center t-small">${cfg.dir}</div>`;
+  h+=equal();
+  h+=`<div class="t-bold">FACTURA: ${f.numero}</div>`;
+  h+=line('Fecha: '+f.fecha);
+  h+=line('Pago:  '+f.pago);
+  h+=dashed();
+  h+=`<div class="t-bold">CLIENTE</div>`;
+  h+=line(cl.establecimiento);
+  if(cl.nombre) h+=line(cl.nombre+' '+cl.apellidos);
+  if(cl.identificacion) h+=line('ID: '+cl.identificacion);
+  h+=dashed();
+  h+=row('<b>Producto</b>','<b>Cant  Total</b>');
+  h+=dashed();
+  f.items.forEach(i=>{
+    h+=row(i.nombre.substring(0,18), i.qty+'  '+fmtNum(i.precio*i.qty));
+    h+=`<div class="t-small" style="padding-left:4px">${cop(i.precio)} c/u</div>`;
+  });
+  h+=equal();
+  h+=row('Subtotal:', fmtNum(f.subtotal));
+  h+=row('IVA ('+f.ivaPct+'%):', fmtNum(f.iva));
+  h+=equal();
+  h+=`<div class="t-row t-bold t-big"><span>TOTAL:</span><span>${fmtNum(f.total)}</span></div>`;
+  h+=equal();
+  const pie = document.getElementById('tog-pie')?.classList.contains('on');
+  const pieTxt = document.getElementById('cfg-pie')?.value||'';
+  if(pie && pieTxt) h+=`<div class="t-center">${pieTxt}</div>`;
+  h+=`<div class="t-center t-small">FacturaFacil · ${hoyISO()}</div>`;
+  h+='<br><br>';
+  document.getElementById('ticket-preview').innerHTML=h;
+}
+
+async function imprimirTicketPrueba(){
+  const cfg=DB.config;
+  const f={id:'test',numero:cfg.prefijo+'000',clienteId:DB.clientes[0]?.id||null,items:[{prodId:'x',nombre:'Producto de prueba',precio:10000,qty:2}],subtotal:20000,ivaPct:19,iva:3800,total:23800,pago:'Efectivo',fecha:hoyISO(),notas:''};
+  if(!btCharacteristic){ toast('Conecta la impresora primero'); return; }
+  try{
+    toast('Imprimiendo prueba...');
+    await enviarBytes(construirTicketESCPOS(f));
+    toast('Prueba impresa ✓');
+  }catch(e){ toast('Error: '+e.message); }
+}
+
+function guardarConfigImpresora(){
+  DB.config.pieTxt = document.getElementById('cfg-pie')?.value||'';
+  save(); toast('Config impresora guardada ✓');
+}
+
+// Override switchTab para manejar modal
+function switchTabModal(tab, targetId){
+  tab.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  ['mv-normal','mv-ticket'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.style.display='none';
+  });
+  document.getElementById(targetId).style.display='block';
+  if(targetId==='mv-ticket' && facturaViendoId) renderTicketPreview(facturaViendoId);
+}
+
+
+async function syncGS(hoja, fila){
+  const scriptUrl = DB.config.gsScript;
+  if(!scriptUrl) return;
+  try{
+    await fetch(scriptUrl, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ hoja, fila }) });
+  }catch(e){}
+}
+
+// ===== EXPORT =====
+function exportarTodo(){
+  const blob = new Blob([JSON.stringify(DB, null,2)],{type:'application/json'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='facturafacil_backup_'+hoyISO()+'.json'; a.click();
+  toast('Backup descargado ✓');
+}
+
+function resetearDatos(){
+  DB = { clientes:[], productos:[], facturas:[], movimientos:[], config:{empresa:'Mi Negocio',nit:'',tel:'',email:'',dir:'Cali, Colombia',iva:19,prefijo:'F-',gsUrl:'',gsScript:''}, seq:{facturas:1} };
+  save(); location.reload();
+}
+
+// ===== INIT =====
+load();
+renderInicio();
+document.getElementById('empresa-nombre-header').textContent = DB.config.empresa||'Mi Negocio';
+// Demo data si está vacío
+if(!DB.productos.length && !DB.clientes.length){
+  DB.productos = [
+    {id:uid(),nombre:'Arroz Diana 1kg',codigo:'ARR-001',precio:3200,stock:120,stockMin:10,categoria:'Alimentos',fecha:hoyISO()},
+    {id:uid(),nombre:'Aceite Girasol 1L',codigo:'ACE-001',precio:12500,stock:8,stockMin:10,categoria:'Alimentos',fecha:hoyISO()},
+    {id:uid(),nombre:'Leche Alquería 1L',codigo:'LEC-001',precio:4800,stock:3,stockMin:5,categoria:'Lácteos',fecha:hoyISO()},
+    {id:uid(),nombre:'Azúcar refinada 1kg',codigo:'AZU-001',precio:4100,stock:65,stockMin:10,categoria:'Alimentos',fecha:hoyISO()},
+  ];
+  DB.clientes = [
+    {id:uid(),establecimiento:'Tienda El Sol',nombre:'Juan',apellidos:'Mora',identificacion:'1001234567',phone:'3105550101',email:'juan@sol.com',direccion:'Calle 10 #5-20 Cali',lat:'3.4516',lng:'-76.5320',notas:'',fecha:hoyISO()},
+    {id:uid(),establecimiento:'Supermercado LP',nombre:'Laura',apellidos:'Pérez',identificacion:'900456789-1',phone:'3152228800',email:'laura@slp.com',direccion:'Av 6N #23-15 Cali',lat:'3.4600',lng:'-76.5100',notas:'',fecha:hoyISO()},
+  ];
+  save(); renderInicio();
+}
+</script>
+</body>
+</html>
